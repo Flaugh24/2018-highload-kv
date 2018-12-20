@@ -47,7 +47,6 @@ public class KVDaoImpl implements KVDao {
 
     @Override
     public void close() throws IOException {
-        dir.delete();
     }
 
     @NotNull
