@@ -55,5 +55,5 @@ final class KVDaoFactory {
         }
 
         return new KVDaoImpl(data);
-       }
+    }
 }
