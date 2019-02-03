@@ -23,6 +23,17 @@ dependencies {
 
     // Guava for tests
     testCompile("com.google.guava:guava:23.1-jre")
+
+
+    //MapDB
+    compile("org.mapdb:mapdb:3.0.5")
+
+    //SLF4J
+    compile("org.slf4j:slf4j-simple:1.6.1");
+
+    //lombok
+    compileOnly("org.projectlombok:lombok:1.18.4")
+
 }
 
 tasks {

@@ -1,55 +1,69 @@
 package ru.mail.polis.gagarkin;
 
 import org.jetbrains.annotations.NotNull;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 import ru.mail.polis.KVDao;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.NoSuchElementException;
+
 
 public class KVDaoImpl implements KVDao {
 
-    @NotNull
-    private final String storage;
+    private final DB db;
+    private final HTreeMap<byte[], Value> storage;
 
-    public KVDaoImpl(@NotNull File dir) {
-        this.storage = dir.getAbsolutePath();
+    public KVDaoImpl(File data) {
+        File dataBase = new File(data, "dataBase");
+        Serializer<Value> serializer = new CustomSerializer();
+        this.db = DBMaker
+                .fileDB(dataBase)
+                .fileMmapEnableIfSupported()
+                .fileMmapPreclearDisable()
+                .fileChannelEnable()
+                .closeOnJvmShutdown()
+                .make();
+        this.storage = db.hashMap(data.getName())
+                .keySerializer(Serializer.BYTE_ARRAY)
+                .valueSerializer(serializer)
+                .createOrOpen();
     }
 
     @NotNull
     @Override
-    public byte[] get(@NotNull byte[] key) throws NoSuchElementException, IOException {
-        try {
-            return Files.readAllBytes(pathByKey(key));
-        } catch (NoSuchFileException e) {
+    public byte[] get(@NotNull byte[] key) throws NoSuchElementException, IllegalStateException {
+        Value value = internalGet(key);
+
+        if (value.getState() == Value.State.ABSENT || value.getState() == Value.State.REMOVED) {
             throw new NoSuchElementException();
         }
+        return value.getData();
+    }
+
+    @NotNull
+    public Value internalGet(@NotNull byte[] key) {
+        Value value = storage.get(key);
+        if (value == null) {
+            return new Value(new byte[]{}, 0, Value.State.ABSENT);
+        }
+        return value;
     }
 
     @Override
-    public void upsert(@NotNull byte[] key, @NotNull byte[] value) throws IOException {
-        Files.write(pathByKey(key), value);
+    public void upsert(@NotNull byte[] key, @NotNull byte[] value) {
+        storage.put(key, new Value(value, System.currentTimeMillis(), Value.State.PRESENT));
     }
 
     @Override
     public void remove(@NotNull byte[] key) {
-        try {
-            Files.delete(pathByKey(key));
-        } catch (IOException e) {
-        }
+        storage.put(key, new Value(new byte[]{}, System.currentTimeMillis(), Value.State.REMOVED));
     }
 
     @Override
-    public void close() throws IOException {
-    }
-
-    @NotNull
-    private Path pathByKey(byte[] key) {
-        return Paths.get(storage, Base64.getUrlEncoder().encodeToString(key));
+    public void close() {
+        db.close();
     }
 }
