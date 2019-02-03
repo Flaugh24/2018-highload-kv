@@ -9,22 +9,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.polis.KVDao;
 import ru.mail.polis.KVService;
-import ru.mail.polis.gagarkin.util.HttpHeader;
-import ru.mail.polis.gagarkin.util.HttpMethod;
 import ru.mail.polis.gagarkin.handler.DeleteHandler;
 import ru.mail.polis.gagarkin.handler.GetHandler;
 import ru.mail.polis.gagarkin.handler.PutHandler;
 import ru.mail.polis.gagarkin.handler.RequestHandler;
+import ru.mail.polis.gagarkin.util.HttpHeader;
+import ru.mail.polis.gagarkin.util.HttpMethod;
 import ru.mail.polis.gagarkin.util.HttpURL;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
 public class KVServiceImpl extends HttpServer implements KVService {
 
 
+    private static final Logger LOG = LoggerFactory.getLogger(KVServiceImpl.class);
     private final int port;
     @NotNull
     private final KVDaoImpl dao;
@@ -33,8 +37,6 @@ public class KVServiceImpl extends HttpServer implements KVService {
     private final String me;
     private final RF defaultRF;
     private final Map<String, HttpClient> clients;
-
-    private static final Logger LOG = LoggerFactory.getLogger(KVServiceImpl.class);
 
     public KVServiceImpl(final int port,
                          @NotNull final KVDao dao,

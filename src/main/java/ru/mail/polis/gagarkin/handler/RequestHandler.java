@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.polis.KVDao;
 import ru.mail.polis.gagarkin.KVDaoImpl;
-import ru.mail.polis.gagarkin.KVDaoImpl;
 import ru.mail.polis.gagarkin.RF;
 
 import java.io.IOException;
@@ -19,14 +18,12 @@ public abstract class RequestHandler {
     final String methodName;
     @NotNull
     final KVDaoImpl dao;
-    @NotNull
-    private final RF rf;
     final String id;
     final byte[] value;
-
     final String TIMESTAMP = "timestamp";
     final String STATE = "state";
-
+    @NotNull
+    private final RF rf;
     private Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     RequestHandler(String methodName, @NotNull KVDao dao, @NotNull RF rf, String id, byte[] value) {

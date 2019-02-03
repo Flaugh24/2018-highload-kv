@@ -6,7 +6,6 @@ import one.nio.http.Response;
 import one.nio.pool.PoolException;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVDao;
-import ru.mail.polis.gagarkin.KVServiceImpl;
 import ru.mail.polis.gagarkin.RF;
 import ru.mail.polis.gagarkin.Value;
 import ru.mail.polis.gagarkin.util.HttpHeader;
@@ -32,7 +31,7 @@ public class GetHandler extends RequestHandler {
         Value value = dao.internalGet(id.getBytes());
         if (value.getState() == Value.State.PRESENT || value.getState() == Value.State.ABSENT) {
             Response response = new Response(Response.OK, value.getData());
-            response.addHeader(TIMESTAMP + String.valueOf(value.getTimestamp()));
+            response.addHeader(TIMESTAMP + value.getTimestamp());
             response.addHeader(STATE + value.getState().name());
             return response;
         } else {

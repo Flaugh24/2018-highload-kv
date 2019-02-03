@@ -6,7 +6,6 @@ import one.nio.http.Response;
 import one.nio.pool.PoolException;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVDao;
-import ru.mail.polis.gagarkin.KVServiceImpl;
 import ru.mail.polis.gagarkin.RF;
 import ru.mail.polis.gagarkin.util.HttpHeader;
 import ru.mail.polis.gagarkin.util.HttpURL;
