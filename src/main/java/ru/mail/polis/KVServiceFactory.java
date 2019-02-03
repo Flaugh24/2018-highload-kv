@@ -56,6 +56,6 @@ final class KVServiceFactory {
         }
 
 
-        return new KVServiceImpl(port, dao);
+        return new KVServiceImpl(port, dao, topology);
     }
 }
